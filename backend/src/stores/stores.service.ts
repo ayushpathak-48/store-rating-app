@@ -76,7 +76,13 @@ export class StoresService {
   }
 
   async getAllStores() {
-    const stores = await this.prisma.store.findMany();
+    const stores = await this.prisma.store.findMany({
+      include: {
+        _count: {
+          select: { ratings: true },
+        },
+      },
+    });
     return {
       success: true,
       message: "Stores retrieved successfully",

@@ -24,7 +24,7 @@ import { useNavigate } from "react-router";
 export const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
-  const { login, user } = useAuthStore();
+  const { login } = useAuthStore();
   const navigate = useNavigate();
 
   const form = useForm<SigninType>({
@@ -39,9 +39,7 @@ export const LoginPage = () => {
     setIsLoading(true);
     try {
       await login(values);
-      if (user?.role === "SYSTEM_ADMIN") navigate("/admin");
-      else if (user?.role === "STORE_OWNER") navigate("/owner");
-      else navigate("/");
+      navigate("/");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to sign in");
     }

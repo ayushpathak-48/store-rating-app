@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import API from "@/lib/api";
 import type { SigninType } from "@/schema/auth.schema";
+import { setLocalStorageItems } from "@/lib/utils";
 
 export interface User {
   id: string;
@@ -14,12 +15,12 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (values: SigninType) => Promise<void>;
-  logout: () => void;
+  login: (values: SigninType) => Promise<User>;
+  // logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
+  user: JSON.parse(localStorage.getItem("user") || "null"),
   isAuthenticated: !!localStorage.getItem("token"),
   token: localStorage.getItem("token"),
   loading: false,
@@ -32,17 +33,23 @@ export const useAuthStore = create<AuthState>((set) => ({
         email,
         password,
       });
-      console.log({ "login response": data });
-      const userData: User = await API.get("/auth/profile");
-      set({ user: userData, token: data.access_token });
-      localStorage.setItem("token", data.access_token);
+      setLocalStorageItems([{ key: "token", value: data.access_token }]);
+      const { data: userData } = await API.get("/auth/profile");
+      set({ user: userData.data, token: data.access_token });
+      setLocalStorageItems([
+        { key: "user", value: JSON.stringify(userData.data) },
+      ]);
+      return userData.data;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     } finally {
       set({ loading: false });
     }
   },
 
-  logout: () => {
-    set({ user: null, token: null });
-    localStorage.removeItem("token");
-  },
+  // logout: () => {
+  //   set({ user: null, token: null });
+  //   localStorage.removeItem("token");
+  // },
 }));

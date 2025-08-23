@@ -1,5 +1,9 @@
+import { useAuthStore } from "@/store/authStore";
+
 const Dashboard = () => {
-  return <div>Dashboard</div>;
+  const { user } = useAuthStore();
+  console.log({ user });
+  return <div>Admin Dashboard</div>;
 };
 
 export default Dashboard;
