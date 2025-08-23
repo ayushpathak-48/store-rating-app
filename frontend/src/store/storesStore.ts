@@ -7,7 +7,7 @@ export interface Store {
   name: string;
   email: string;
   address: string;
-  owner: string;
+  ownerId: string;
   createdAt: string;
 }
 
@@ -55,16 +55,20 @@ export const useStoresStore = create<StoresState>((set) => ({
   addStore: async (storeData) => {
     set({ loading: true, error: null });
     try {
-      const { data: res } = await API.post("/stores", storeData);
+      const { data: res } = await API.post("/stores/create", storeData);
       if (!res.success) {
         toast.error(res.message || "Failed to add store");
         set({
           error: res?.message || "Failed to add store",
           loading: false,
         });
-        return;
+        return null;
       }
-      set((state) => ({ stores: [...state.stores, res.data], loading: false }));
+      set((state) => ({
+        stores: [...state.stores, res.data],
+        loading: false,
+      }));
+      return res.data;
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to add store",
@@ -103,10 +107,13 @@ export const useStoresStore = create<StoresState>((set) => ({
 
   // Delete a store
   deleteStore: async (id) => {
+    const loadingToast = toast.loading(
+      "Please wait while deleting the store...",
+    );
     set({ loading: true, error: null });
     try {
       const { data: res } = await API.delete(`/stores/${id}`);
-
+      toast.dismiss(loadingToast);
       if (!res.success) {
         toast.error(res.message || "Failed to delete store");
         set({
@@ -115,12 +122,13 @@ export const useStoresStore = create<StoresState>((set) => ({
         });
         return;
       }
-
+      toast.success("Store deleted successfully");
       set((state) => ({
         stores: state.stores.filter((store) => store.id !== id),
         loading: false,
       }));
     } catch (err: any) {
+      toast.dismiss(loadingToast);
       set({
         error: err.response?.data?.message || "Failed to delete store",
         loading: false,

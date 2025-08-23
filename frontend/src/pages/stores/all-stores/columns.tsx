@@ -1,9 +1,8 @@
-"use client";
-
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ColumnDef } from "@tanstack/react-table";
+import { StoreTableActions } from "./stores-table-actions";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -92,6 +91,30 @@ export const columns: ColumnDef<any>[] = [
     },
   },
   {
+    accessorKey: "ratings",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="m-0 p-0"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Total Ratings
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>
+          <span className={cn("truncate")}>
+            {row?.original?._count?.ratings}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "action",
     header: ({ column }) => {
       return (
@@ -106,8 +129,7 @@ export const columns: ColumnDef<any>[] = [
       );
     },
     cell: ({ row }) => {
-      console.log(row);
-      //   return <FacultyTableActions faculty={row.original} />;
+      return <StoreTableActions store={row?.original} />;
     },
   },
 ];

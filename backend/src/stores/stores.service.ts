@@ -25,6 +25,16 @@ export class StoresService {
       );
     }
 
+    const isEmailUsed = await this.prisma.store.findFirst({
+      where: { email: dto.email },
+    });
+
+    if (isEmailUsed) {
+      throw new BadRequestException(
+        "Email is already in used by different store. Please use a different email.",
+      );
+    }
+
     const createdStore = await this.prisma.store.create({
       data: {
         name: dto.name,
