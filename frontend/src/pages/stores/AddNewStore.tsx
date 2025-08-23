@@ -27,11 +27,14 @@ import { useUserStore } from "@/store/userStore";
 import { Loader } from "lucide-react";
 
 export const AddNewStore = () => {
-  const users = useUserStore((state) => state.users);
+  const systemAdmins = useUserStore((state) => state.systemAdmins);
+  const storeOwners = useUserStore((state) => state.storeOwners);
   const fetchUsers = useUserStore((state) => state.getAllUsers);
 
   useEffect(() => {
-    fetchUsers();
+    if (!systemAdmins.length) {
+      fetchUsers();
+    }
   }, []);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +59,7 @@ export const AddNewStore = () => {
     setIsLoading(false);
   };
 
-  if (!users) return <Loader className="animate-spin" />;
+  if (!systemAdmins) return <Loader className="animate-spin" />;
 
   return (
     <Card className="w-full h-max md:w-[487px] mx-auto">
@@ -86,7 +89,7 @@ export const AddNewStore = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {users?.map((user) => (
+                      {storeOwners?.map((user) => (
                         <SelectItem key={user.id} value={user.id}>
                           {user.name}
                         </SelectItem>

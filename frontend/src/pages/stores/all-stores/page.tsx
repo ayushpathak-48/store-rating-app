@@ -7,7 +7,9 @@ export const AllStoresPage = () => {
   const { stores, fetchStores } = useStoresStore();
 
   useEffect(() => {
-    fetchStores();
+    if (!stores.length) {
+      fetchStores();
+    }
   }, []);
 
   const data = React.useMemo(() => stores, [stores]);

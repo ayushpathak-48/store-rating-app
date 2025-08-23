@@ -70,6 +70,7 @@ export const useStoresStore = create<StoresState>((set) => ({
       }));
       return res.data;
     } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to add store");
       set({
         error: err.response?.data?.message || "Failed to add store",
         loading: false,

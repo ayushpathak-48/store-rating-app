@@ -11,6 +11,8 @@ export interface User {
 
 interface UserState {
   users: User[];
+  storeOwners: User[];
+  systemAdmins: User[];
   loading: boolean;
   getAllUsers: () => Promise<User[]>;
   addUser: (values: SignupType) => Promise<User>;
@@ -20,6 +22,8 @@ interface UserState {
 
 export const useUserStore = create<UserState>((set) => ({
   users: [],
+  storeOwners: [],
+  systemAdmins: [],
   loading: false,
 
   getAllUsers: async () => {
@@ -27,7 +31,16 @@ export const useUserStore = create<UserState>((set) => ({
     try {
       const response = await API.get("/users");
       const { data: users } = response.data;
-      set({ users });
+
+      const storeOwners = users.filter(
+        (user: User) => user.role === "STORE_OWNER",
+      );
+      const systemAdmins = users.filter(
+        (user: User) => user.role === "SYSTEM_ADMIN",
+      );
+      const normalUsers = users.filter((user: User) => user.role === "USER");
+
+      set({ storeOwners, systemAdmins, users: normalUsers });
       return users;
     } finally {
       set({ loading: false });

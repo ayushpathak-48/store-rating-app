@@ -116,6 +116,33 @@ export class StoresService {
     };
   }
 
+  async deleteStore(storeId: string, userRole: Role, userId: string) {
+    const store = await this.prisma.store.findUnique({
+      where: { id: storeId },
+    });
+
+    if (!store)
+      throw new NotFoundException({
+        success: false,
+        message: "Store not found",
+      });
+
+    if (userRole === Role.STORE_OWNER && store.ownerId !== userId)
+      throw new ForbiddenException({
+        success: false,
+        message: "You do not have access to delete this store",
+      });
+
+    await this.prisma.store.delete({
+      where: { id: storeId },
+    });
+
+    return {
+      success: true,
+      message: "Store deleted successfully",
+    };
+  }
+
   async getStoreRatings(storeId: string, userRole: Role, userId: string) {
     const store = await this.prisma.store.findUnique({
       where: { id: storeId },
