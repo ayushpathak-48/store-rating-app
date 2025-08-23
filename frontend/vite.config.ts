@@ -12,11 +12,13 @@ export default defineConfig({
     },
   },
   server: {
+    port: 5173, // optional
     proxy: {
       "/api": {
-        target: process.env.VITE_BACKEND_URL, // NestJS backend
+        target: "https://store-rating-app-ijr7.onrender.com", // your backend URL
         changeOrigin: true,
         secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
   },
