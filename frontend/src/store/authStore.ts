@@ -33,7 +33,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         password,
       });
       console.log({ "login response": data });
-      set({ user: data.user, token: data.access_token });
+      const userData: User = await API.get("/auth/profile");
+      set({ user: userData, token: data.access_token });
       localStorage.setItem("token", data.access_token);
     } finally {
       set({ loading: false });
