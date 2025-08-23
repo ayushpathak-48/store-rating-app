@@ -1,10 +1,10 @@
 import { columns } from "./columns";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { DataTable } from "./data-table";
 import { useStoresStore } from "@/store/storesStore";
 
 export const AllStoresPage = () => {
-  const { stores, fetchStores } = useStoresStore();
+  const { stores, fetchStores, loading } = useStoresStore();
 
   useEffect(() => {
     if (!stores.length) {
@@ -12,10 +12,9 @@ export const AllStoresPage = () => {
     }
   }, []);
 
-  const data = React.useMemo(() => stores, [stores]);
   return (
     <div>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={stores} loading={loading} />
     </div>
   );
 };

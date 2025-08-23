@@ -22,19 +22,20 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router";
+import { Loader } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   showFeedbackFilters?: boolean;
-  hideSearch?: boolean;
+  loading: boolean;
   headerTitle?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  hideSearch = false,
+  loading,
   headerTitle = "",
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -60,14 +61,12 @@ export function DataTable<TData, TValue>({
         {headerTitle && (
           <div className="text-lg font-medium w-max">{headerTitle}</div>
         )}
-        {!hideSearch && (
-          <Input
-            placeholder="Search..."
-            value={(table?.getState().globalFilter as string) ?? ""}
-            onChange={(event) => table?.setGlobalFilter(event.target.value)}
-            className="max-w-sm"
-          />
-        )}
+        <Input
+          placeholder="Search..."
+          value={(table?.getState().globalFilter as string) ?? ""}
+          onChange={(event) => table?.setGlobalFilter(event.target.value)}
+          className="max-w-sm"
+        />
         <Button asChild>
           <Link to={"/admin/stores/add"}>Add Store</Link>
         </Button>
@@ -93,31 +92,42 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell className="px-5" key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
+            {true ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
+                  className="h-24 text-center flex justify-center items-center"
+                ></TableCell>
               </TableRow>
+            ) : (
+              <>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell className="px-5" key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </>
             )}
           </TableBody>
         </Table>

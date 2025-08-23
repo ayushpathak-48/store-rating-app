@@ -23,10 +23,10 @@ interface StoresState {
   setSelectedStore: (store: Store) => void;
 }
 
-export const useStoresStore = create<StoresState>((set) => ({
+export const useStoresStore = create<StoresState>((set, get) => ({
   stores: [],
   selectedStore: null,
-  loading: false,
+  loading: get()?.stores.length > 0 ? false : true,
   error: null,
 
   // Fetch all stores
