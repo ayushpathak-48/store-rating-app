@@ -3,33 +3,29 @@ import {
   IsNotEmpty,
   MinLength,
   MaxLength,
-  IsEnum,
-  NotEquals,
+  Matches,
 } from "class-validator";
-import { Role } from "@prisma/client";
 
 export class RegisterDto {
-  @IsNotEmpty({ message: "Name is required" })
-  @MinLength(3, { message: "Name must be at least 3 characters" })
   @MaxLength(60, { message: "Name cannot exceed 60 characters" })
+  @MinLength(20, { message: "Name must be at least 20 characters long" })
+  @IsNotEmpty({ message: "Name is required" })
   name: string;
 
-  @IsNotEmpty({ message: "Email is required" })
   @IsEmail({}, { message: "Invalid email address" })
+  @IsNotEmpty({ message: "Email is required" })
   email: string;
 
-  @IsNotEmpty({ message: "Password is required" })
+  @Matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).*$/, {
+    message:
+      "Password must contain at least one uppercase letter and one special character",
+  })
+  @MaxLength(16, { message: "Password cannot exceed 16 characters" })
   @MinLength(8, { message: "Password must be at least 8 characters long" })
+  @IsNotEmpty({ message: "Password is required" })
   password: string;
 
+  @MaxLength(400, { message: "Address cannot exceed 400 characters" })
   @IsNotEmpty({ message: "Address is required" })
   address: string;
-
-  @IsEnum(Role, {
-    message: `Role must be one of: ${Object.values(Role)
-      .filter((role) => role != "SYSTEM_ADMIN")
-      .join(", ")}`,
-  })
-  @NotEquals(Role.SYSTEM_ADMIN, { message: "Cannot register as SYSTEM_ADMIN" })
-  role: Role;
 }

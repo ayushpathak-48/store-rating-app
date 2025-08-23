@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "public"."Role" AS ENUM ('ADMIN', 'USER', 'OWNER');
+CREATE TYPE "public"."Role" AS ENUM ('SYSTEM_ADMIN', 'USER', 'STORE_OWNER');
 
 -- CreateTable
 CREATE TABLE "public"."User" (
@@ -17,9 +17,9 @@ CREATE TABLE "public"."User" (
 -- CreateTable
 CREATE TABLE "public"."Store" (
     "id" TEXT NOT NULL,
-    "name" VARCHAR(100) NOT NULL,
+    "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "address" VARCHAR(400) NOT NULL,
+    "address" TEXT NOT NULL,
     "ownerId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -32,7 +32,9 @@ CREATE TABLE "public"."Rating" (
     "userId" TEXT NOT NULL,
     "storeId" TEXT NOT NULL,
     "rating" INTEGER NOT NULL,
+    "comment" VARCHAR(400),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Rating_pkey" PRIMARY KEY ("id")
 );
@@ -42,6 +44,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Store_email_key" ON "public"."Store"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Rating_userId_storeId_key" ON "public"."Rating"("userId", "storeId");
 
 -- AddForeignKey
 ALTER TABLE "public"."Store" ADD CONSTRAINT "Store_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

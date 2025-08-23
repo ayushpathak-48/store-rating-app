@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { ValidationPipe } from "@nestjs/common";
+import { BadRequestException, ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,6 +10,21 @@ async function bootstrap() {
       forbidNonWhitelisted: true, // Throw error on unknown fields
       transform: true,
       stopAtFirstError: false, // Show all validation errors
+      exceptionFactory: (errors) => {
+        const formattedErrors = {};
+
+        errors.forEach((err) => {
+          if (err.constraints) {
+            formattedErrors[err.property] = Object.values(err.constraints);
+          }
+        });
+
+        return new BadRequestException({
+          success: false,
+          message: "Validation Errors",
+          errors: formattedErrors,
+        });
+      },
     }),
   );
 

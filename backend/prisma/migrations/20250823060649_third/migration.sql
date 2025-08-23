@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "public"."Store" ALTER COLUMN "name" SET DATA TYPE TEXT,
-ALTER COLUMN "address" SET DATA TYPE TEXT;
