@@ -2,7 +2,11 @@ import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return "Hello World!";
+  getHello() {
+    return {
+      message: "Welcome to the Ratings API",
+      status: "OK",
+      owner: "Aayush Pathak",
+    };
   }
 }
