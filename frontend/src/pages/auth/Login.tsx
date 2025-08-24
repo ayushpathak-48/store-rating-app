@@ -2,7 +2,13 @@
 
 import { Input } from "@/components/ui/input";
 import { DottedSeparator } from "@/components/dotted-separator";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,7 +25,8 @@ import { useState } from "react";
 import { LoadingButton } from "@/components/loading-button";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { APP_TITLE } from "@/lib/constants";
 
 export const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -38,19 +45,19 @@ export const LoginPage = () => {
   const handleSubmit = async (values: SigninType) => {
     setIsLoading(true);
     try {
-      await login(values);
-      navigate("/");
+      const loggedIn = await login(values);
+      toast.success("Login Successfull");
+      if (loggedIn) navigate("/", { replace: true });
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to sign in");
     }
-
     setIsLoading(false);
   };
 
   return (
     <Card className="w-full h-full md:w-[487px] border-none shadow-none gap-1">
       <CardHeader className="flex items-center justify-center text-center p-7">
-        <CardTitle className="text-2xl">RateMonks - Login</CardTitle>
+        <CardTitle className="text-2xl">{APP_TITLE} - Login</CardTitle>
       </CardHeader>
       <DottedSeparator className="px-7 pb-0" />
       <CardContent className="p-7">
@@ -118,6 +125,14 @@ export const LoginPage = () => {
           </form>
         </Form>
       </CardContent>
+      <CardFooter>
+        <div className="text-center w-full">
+          Don't have an account?{" "}
+          <Link to={"/auth/signup"} className="text-blue-500">
+            Sign Up
+          </Link>
+        </div>
+      </CardFooter>
     </Card>
   );
 };

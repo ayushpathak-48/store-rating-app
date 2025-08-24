@@ -10,7 +10,7 @@ import { logoutUser } from "@/lib/utils";
 
 export const Sidebar = () => {
   return (
-    <aside className="h-full p-4 w-full flex flex-col justify-between">
+    <aside className="h-full bg-neutral-100 dark:bg-gray-900 p-4 w-full flex flex-col justify-between">
       <div>
         <Link to={"/"} className="text-3xl flex items-center justify-center">
           {APP_TITLE}

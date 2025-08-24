@@ -3,9 +3,13 @@ import { HomeIcon } from "lucide-react";
 export const APP_TITLE = "RateMonks";
 
 export const pathnameMap = {
-  feedbacks: {
-    title: "Feedbacks",
-    description: "View all feedback list here submitted by students",
+  stores: {
+    title: "Stores",
+    description: "View all stores list here",
+  },
+  users: {
+    title: "Users",
+    description: "View all users list here",
   },
 };
 

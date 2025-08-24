@@ -6,7 +6,7 @@ export class AppService {
     return {
       message: "Welcome to the Ratings API",
       status: "OK",
-      owner: "Aayush Pathak",
+      author: "Aayush Pathak",
     };
   }
 }

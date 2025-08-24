@@ -10,7 +10,7 @@ import ThemeToggle from "./theme-toggler-button";
 export const Navbar = () => {
   const location = useLocation();
   const pathnameParts = location.pathname.split("/");
-  const pathnameKey = pathnameParts[1] as keyof typeof pathnameMap;
+  const pathnameKey = pathnameParts[2] as keyof typeof pathnameMap;
   const { title, description } = pathnameMap[pathnameKey] || defaultMap;
 
   return (

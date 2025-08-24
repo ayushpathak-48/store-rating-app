@@ -1,18 +1,14 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private prisma: PrismaService,
-    private config: ConfigService,
-  ) {
+  constructor(private prisma: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.get<string>("JWT_SECRET"),
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
@@ -22,11 +18,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
 
     if (!user) {
-      throw new UnauthorizedException("User does not exist or was deleted");
+      throw new UnauthorizedException("User not exist or deleted");
     }
 
     return {
       id: user.id,
+      name: user.name,
       email: user.email,
       role: user.role,
     };

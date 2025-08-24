@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   ConflictException,
   NotFoundException,
+  ForbiddenException,
 } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { JwtService } from "@nestjs/jwt";
@@ -10,6 +11,7 @@ import * as bcrypt from "bcrypt";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { User } from "@prisma/client";
+import { UpdteProfileDto } from "./dto/update-profile.dto";
 
 @Injectable()
 export class AuthService {
@@ -27,17 +29,19 @@ export class AuthService {
       where: { email: dto.email },
     });
     if (existingUser) {
-      throw new ConflictException("Email already exists");
+      throw new ConflictException({
+        success: false,
+        message: "Email already exists try different email",
+      });
     }
-
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
     const registeredUser = await this.prisma.user.create({
       data: {
         name: dto.name,
         email: dto.email,
         password: hashedPassword,
         address: dto.address,
+        role: dto.role,
       },
     });
 
@@ -51,6 +55,62 @@ export class AuthService {
     };
   }
 
+  async updateUserProfile(
+    id: string,
+    dto: UpdteProfileDto,
+    user: User,
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data: Omit<User, "password">;
+  }> {
+    if (user.id !== id && user.role !== "SYSTEM_ADMIN") {
+      throw new ForbiddenException({
+        success: false,
+        message: "You cannot update this user",
+      });
+    }
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    if (!existingUser) {
+      throw new NotFoundException({
+        success: false,
+        message: "User Not found with this id",
+      });
+    }
+
+    const isEmailAlreadyTaken = await this.prisma.user.findFirst({
+      where: { email: dto.email, id: { not: id } },
+    });
+    if (isEmailAlreadyTaken) {
+      throw new ConflictException({
+        success: false,
+        message: "Email already exists try different email",
+      });
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id },
+      data: {
+        name: dto.name,
+        email: dto.email,
+        address: dto.address,
+        role: dto.role,
+      },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = updatedUser;
+
+    return {
+      success: true,
+      message: "User updated successfully",
+      data: userWithoutPassword,
+    };
+  }
+
+  // Login Service
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
@@ -68,6 +128,7 @@ export class AuthService {
     };
   }
 
+  // Get Profile Service
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },

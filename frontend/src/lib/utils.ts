@@ -23,3 +23,8 @@ export const logoutUser = () => {
   removeLocalStorageItems(["token", "user"]);
   window.location.href = "/auth/login";
 };
+
+export const formatRole = (role: string | undefined) => {
+  if (!role) return "";
+  return role.split("_").join(" ");
+};

@@ -26,7 +26,7 @@ model User {
   password  String
   address   String?  @db.VarChar(400)
   role      Role     @default(USER)
-  stores    Store[]
+  store     Store?
   ratings   Rating[]
   createdAt DateTime @default(now())
 }
@@ -37,7 +37,7 @@ model Store {
   email     String   @unique
   address   String
   owner     User     @relation(fields: [ownerId], references: [id])
-  ownerId   String
+  ownerId   String   @unique
   ratings   Rating[]
   createdAt DateTime @default(now())
 }

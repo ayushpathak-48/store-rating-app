@@ -7,6 +7,7 @@ import { StoresModule } from "./stores/stores.module";
 import { RatingsModule } from "./ratings/ratings.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AppService } from "./app.service";
     UsersModule,
     StoresModule,
     RatingsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

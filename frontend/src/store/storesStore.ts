@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import API from "@/lib/api";
 import { toast } from "sonner";
+import type { StoreSchemaType } from "@/schema/store.schema";
 
 export interface Store {
   id: string;
@@ -15,18 +16,20 @@ interface StoresState {
   stores: Store[];
   selectedStore: Store | null;
   loading: boolean;
+  isStoresLoaded: boolean;
   error: string | null;
   fetchStores: () => Promise<void>;
   addStore: (store: Omit<Store, "id" | "createdAt">) => Promise<void>;
-  updateStore: (id: string, updatedData: Partial<Store>) => Promise<void>;
+  updateStore: (id: string, updatedData: StoreSchemaType) => Promise<void>;
   deleteStore: (id: string) => Promise<void>;
   setSelectedStore: (store: Store) => void;
 }
 
-export const useStoresStore = create<StoresState>((set, get) => ({
+export const useStoresStore = create<StoresState>((set) => ({
   stores: [],
   selectedStore: null,
-  loading: get()?.stores.length > 0 ? false : true,
+  loading: false,
+  isStoresLoaded: false,
   error: null,
 
   // Fetch all stores
@@ -48,6 +51,8 @@ export const useStoresStore = create<StoresState>((set, get) => ({
         error: err.response?.data?.message || "Failed to fetch stores",
         loading: false,
       });
+    } finally {
+      set({ isStoresLoaded: true });
     }
   },
 
@@ -68,6 +73,7 @@ export const useStoresStore = create<StoresState>((set, get) => ({
         stores: [...state.stores, res.data],
         loading: false,
       }));
+      toast.success("Store created successfully");
       return res.data;
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to add store");
@@ -79,7 +85,7 @@ export const useStoresStore = create<StoresState>((set, get) => ({
   },
 
   // Update a store
-  updateStore: async (id, updatedData) => {
+  updateStore: async (id: string, updatedData: StoreSchemaType) => {
     set({ loading: true, error: null });
     try {
       const { data: res } = await API.put(`/stores/${id}`, updatedData);
@@ -98,6 +104,7 @@ export const useStoresStore = create<StoresState>((set, get) => ({
         ),
         loading: false,
       }));
+      toast.success("Store updated successfully");
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to update store",

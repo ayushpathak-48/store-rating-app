@@ -1,13 +1,16 @@
 import { create } from "zustand";
 import API from "@/lib/api";
-import type { SigninType } from "@/schema/auth.schema";
+import type { SigninType, SignUpSchemaType } from "@/schema/auth.schema";
 import { setLocalStorageItems } from "@/lib/utils";
+
+export type UserRoles = "SYSTEM_ADMIN" | "USER" | "STORE_OWNER";
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: "SYSTEM_ADMIN" | "USER" | "STORE_OWNER";
+  role: UserRoles;
+  address: string;
 }
 
 interface AuthState {
@@ -15,7 +18,8 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (values: SigninType) => Promise<User>;
+  login: (values: SigninType) => Promise<boolean>;
+  signup: (values: SignUpSchemaType) => Promise<boolean>;
   // logout: () => void;
 }
 
@@ -34,17 +38,32 @@ export const useAuthStore = create<AuthState>((set) => ({
         password,
       });
       setLocalStorageItems([{ key: "token", value: data.access_token }]);
-      const { data: userData } = await API.get("/auth/profile");
-      set({ user: userData.data, token: data.access_token });
+      const { data: profileResponse } = await API.get("/auth/profile");
+      set({
+        user: profileResponse.data,
+        token: data.access_token,
+        isAuthenticated: true,
+      });
       setLocalStorageItems([
-        { key: "user", value: JSON.stringify(userData.data) },
+        { key: "user", value: JSON.stringify(profileResponse.data) },
       ]);
-      return userData.data;
+      return true;
     } catch (error) {
       console.error("Login error:", error);
-      throw error;
+      return false;
     } finally {
       set({ loading: false });
+    }
+  },
+
+  signup: async (values: SignUpSchemaType) => {
+    set({ loading: true });
+    try {
+      await API.post("/auth/register", values);
+      return true;
+    } catch (error) {
+      console.error("Signup error:", error);
+      return false;
     }
   },
 

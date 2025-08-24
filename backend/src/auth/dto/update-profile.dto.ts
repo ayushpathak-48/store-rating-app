@@ -4,11 +4,10 @@ import {
   IsNotEmpty,
   MinLength,
   MaxLength,
-  Matches,
   IsOptional,
 } from "class-validator";
 
-export class RegisterDto {
+export class UpdteProfileDto {
   @MaxLength(60, { message: "Name cannot exceed 60 characters" })
   @MinLength(20, { message: "Name must be at least 20 characters long" })
   @IsNotEmpty({ message: "Name is required" })
@@ -17,15 +16,6 @@ export class RegisterDto {
   @IsEmail({}, { message: "Invalid email address" })
   @IsNotEmpty({ message: "Email is required" })
   email: string;
-
-  @Matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).*$/, {
-    message:
-      "Password must contain at least one uppercase letter and one special character",
-  })
-  @MaxLength(16, { message: "Password cannot exceed 16 characters" })
-  @MinLength(8, { message: "Password must be at least 8 characters long" })
-  @IsNotEmpty({ message: "Password is required" })
-  password: string;
 
   @MaxLength(400, { message: "Address cannot exceed 400 characters" })
   @IsNotEmpty({ message: "Address is required" })

@@ -22,25 +22,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useStoresStore } from "@/store/storesStore";
-import { AddStoreSchema, type AddStoreSchemaType } from "@/schema/store.schema";
+import { StoreSchema, type StoreSchemaType } from "@/schema/store.schema";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "lucide-react";
+import { useNavigate, useParams } from "react-router";
+import SkeletonWrapper from "@/components/common/SkeletonWrapper";
 
-export const AddNewStore = () => {
-  const systemAdmins = useUserStore((state) => state.systemAdmins);
+export const EditStorePage = () => {
+  const { storeId } = useParams();
+  const navigate = useNavigate();
+  const isUsersLoaded = useUserStore((state) => state.isUsersLoaded);
   const storeOwners = useUserStore((state) => state.storeOwners);
+  const stores = useStoresStore((state) => state.stores);
+  const isStoresLoaded = useStoresStore((state) => state.isStoresLoaded);
+  const fetchStores = useStoresStore((state) => state.fetchStores);
   const fetchUsers = useUserStore((state) => state.getAllUsers);
-
-  useEffect(() => {
-    if (!systemAdmins.length) {
-      fetchUsers();
-    }
-  }, []);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const addStore = useStoresStore((state) => state.addStore);
-  const form = useForm<AddStoreSchemaType>({
-    resolver: zodResolver(AddStoreSchema),
+  const [isUpdating, setIsUpdating] = useState(false);
+  const updateStore = useStoresStore((state) => state.updateStore);
+  const form = useForm<StoreSchemaType>({
+    resolver: zodResolver(StoreSchema),
     defaultValues: {
       ownerId: "",
       name: "",
@@ -49,22 +48,44 @@ export const AddNewStore = () => {
     },
   });
 
-  const handleSubmit = async (values: AddStoreSchemaType) => {
-    setIsLoading(true);
+  useEffect(() => {
+    if (!isUsersLoaded) {
+      fetchUsers();
+    }
+    if (!isStoresLoaded) {
+      fetchStores();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isStoresLoaded && isUsersLoaded) {
+      const tempStore = stores.find((s) => s.id === storeId);
+      if (!tempStore) navigate("/admin/stores", { replace: true });
+      form.reset({
+        ownerId: tempStore?.ownerId || "",
+        name: tempStore?.name || "",
+        address: tempStore?.address || "",
+        email: tempStore?.email || "",
+      });
+    }
+  }, [isStoresLoaded, isUsersLoaded]);
+
+  const handleSubmit = async (values: StoreSchemaType) => {
     try {
-      await addStore(values);
+      setIsUpdating(true);
+      await updateStore(storeId as string, values);
+      navigate("/admin/stores");
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsUpdating(false);
     }
-    setIsLoading(false);
   };
-
-  if (!systemAdmins) return <Loader className="animate-spin" />;
 
   return (
     <Card className="w-full h-max md:w-[487px] mx-auto">
       <CardHeader className="flex items-center justify-center text-center p-7">
-        <CardTitle className="text-2xl">Add Store</CardTitle>
+        <CardTitle className="text-2xl">Update Store</CardTitle>
       </CardHeader>
       <DottedSeparator className="px-7 mb-2" />
       <CardContent className="p-7">
@@ -81,12 +102,17 @@ export const AddNewStore = () => {
                   <FormLabel>Select Owner</FormLabel>
                   <Select
                     onValueChange={field.onChange}
+                    value={field.value}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a suitable faculty for this member" />
-                      </SelectTrigger>
+                      <SkeletonWrapper
+                        isLoading={!isStoresLoaded || !isUsersLoaded}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a suitable faculty for this member" />
+                        </SelectTrigger>
+                      </SkeletonWrapper>
                     </FormControl>
                     <SelectContent>
                       {storeOwners?.map((user) => (
@@ -107,7 +133,11 @@ export const AddNewStore = () => {
                 <FormItem>
                   <FormLabel>Store Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter Store Name" />
+                    <SkeletonWrapper
+                      isLoading={!isStoresLoaded || !isUsersLoaded}
+                    >
+                      <Input {...field} placeholder="Enter Store Name" />
+                    </SkeletonWrapper>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -120,11 +150,15 @@ export const AddNewStore = () => {
                 <FormItem>
                   <FormLabel>Store Email</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="text"
-                      placeholder="Enter Store Email"
-                    />
+                    <SkeletonWrapper
+                      isLoading={!isStoresLoaded || !isUsersLoaded}
+                    >
+                      <Input
+                        {...field}
+                        type="text"
+                        placeholder="Enter Store Email"
+                      />
+                    </SkeletonWrapper>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,11 +172,15 @@ export const AddNewStore = () => {
                 <FormItem>
                   <FormLabel>Store Address</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="text"
-                      placeholder="Enter Store Address"
-                    />
+                    <SkeletonWrapper
+                      isLoading={!isStoresLoaded || !isUsersLoaded}
+                    >
+                      <Input
+                        {...field}
+                        type="text"
+                        placeholder="Enter Store Address"
+                      />
+                    </SkeletonWrapper>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -152,11 +190,11 @@ export const AddNewStore = () => {
             <DottedSeparator className="px-7 mb-2" />
             <LoadingButton
               className="w-full"
-              isLoading={isLoading}
+              isLoading={isUpdating}
               type="submit"
               size="lg"
             >
-              Add Store
+              Update
             </LoadingButton>
           </form>
         </Form>

@@ -1,12 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { DottedSeparator } from "@/components/dotted-separator";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,40 +13,39 @@ import {
 } from "@/components/ui/form";
 import { useState } from "react";
 import { LoadingButton } from "@/components/loading-button";
-import { SignUpSchema, type SignUpSchemaType } from "@/schema/auth.schema";
+import { UserSchema, type UserSchemaType } from "@/schema/user.schema";
+import { useUserStore } from "@/store/userStore";
 import { Eye, EyeOff } from "lucide-react";
-import { Link, useNavigate } from "react-router";
-import { APP_TITLE } from "@/lib/constants";
-import { useAuthStore } from "@/store/authStore";
-import { toast } from "sonner";
+import { useNavigate } from "react-router";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "@/lib/utils";
 
-export const SignUpPage = () => {
+export const AddUserPage = () => {
   const navigate = useNavigate();
-  const signup = useAuthStore((state) => state.signup);
-  const login = useAuthStore((state) => state.login);
+  const addUser = useUserStore((state) => state.addUser);
+
   const [isLoading, setIsLoading] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
 
-  const form = useForm<SignUpSchemaType>({
-    resolver: zodResolver(SignUpSchema),
+  const form = useForm<UserSchemaType>({
+    resolver: zodResolver(UserSchema),
     defaultValues: {
       name: "",
       address: "",
       email: "",
+      role: "USER",
       password: "",
     },
   });
 
-  const handleSubmit = async (values: SignUpSchemaType) => {
+  const handleSubmit = async (values: UserSchemaType) => {
     setIsLoading(true);
     try {
-      const signedUp = await signup(values);
-      if (!signedUp) return;
-      await login({ email: values.email, password: values.password });
-      toast.success("Registration Successfull");
-      navigate("/", { replace: true });
-    } catch (error: any) {
-      toast.error(`Registration failed : ${error.response?.data?.message}`);
+      const addedUser = await addUser(values);
+      if (!addedUser) return;
+      navigate("/admin/users");
+    } catch (error) {
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -61,13 +54,13 @@ export const SignUpPage = () => {
   return (
     <Card className="w-full h-max md:w-[487px] mx-auto gap-1">
       <CardHeader className="flex items-center justify-center text-center p-7">
-        <CardTitle className="text-2xl">{APP_TITLE} - Sign Up</CardTitle>
+        <CardTitle className="text-2xl">Add User</CardTitle>
       </CardHeader>
-      <DottedSeparator className="px-7 pb-0" />
+      <DottedSeparator className="px-7" />
       <CardContent className="p-7">
         <Form {...form}>
           <form
-            className="space-y-4 gap-2 flex flex-col"
+            className="space-y-4"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
             <FormField
@@ -149,6 +142,55 @@ export const SignUpPage = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>User Role</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex"
+                    >
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <RadioGroupItem value="USER" className="hidden" />
+                        </FormControl>
+                        <FormLabel
+                          className={cn(
+                            "flex items-center gap-2 w-full border rounded p-3 cursor-pointer justify-center",
+                            form.getValues("role") == "USER" &&
+                              "border-primary",
+                          )}
+                        >
+                          User
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <RadioGroupItem
+                            value="STORE_OWNER"
+                            className="hidden"
+                          />
+                        </FormControl>
+                        <FormLabel
+                          className={cn(
+                            "flex items-center gap-2 w-full border rounded p-3 cursor-pointer justify-center",
+                            form.getValues("role") == "STORE_OWNER" &&
+                              "border-primary",
+                          )}
+                        >
+                          Store Owner
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DottedSeparator className="px-7 mb-2" />
             <LoadingButton
               className="w-full"
@@ -156,19 +198,11 @@ export const SignUpPage = () => {
               type="submit"
               size="lg"
             >
-              SignUp
+              Add User
             </LoadingButton>
           </form>
         </Form>
-      </CardContent>{" "}
-      <CardFooter>
-        <div className="text-center w-full">
-          Don't have an account?{" "}
-          <Link to={"/auth/login"} className="text-blue-500">
-            Log In
-          </Link>
-        </div>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };
