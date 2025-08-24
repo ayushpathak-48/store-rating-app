@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://store-rating-app-ijr7.onrender.com/$1"
+    }
+  ]
+}
