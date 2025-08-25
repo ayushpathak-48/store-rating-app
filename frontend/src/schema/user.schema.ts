@@ -14,8 +14,8 @@ export const UserSchema = z.object({
   address: z.string().nonempty("Address is required"),
   password: z
     .string()
-    .min(1, { message: "Password is required" })
+    .nonempty({ message: "Password is required" })
     .min(8, { message: "Password should be minimum 8 characters long" }),
-  role: z.enum(["STORE_OWNER", "USER"]),
+  role: z.enum(["STORE_OWNER", "USER"]).optional(),
 });
 export type UserSchemaType = z.infer<typeof UserSchema>;

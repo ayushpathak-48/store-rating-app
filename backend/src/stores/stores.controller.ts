@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from "@nestjs/common";
@@ -35,9 +36,9 @@ export class StoresController {
   }
 
   @Get()
-  @Roles(Role.SYSTEM_ADMIN, Role.USER)
-  getAllStores() {
-    return this.storesService.getAllStores();
+  getAllStores(@Req() req, @Query("includeRatings") includeRatings?: string) {
+    const include = includeRatings === "true";
+    return this.storesService.getAllStores(include, req.user.id as string);
   }
 
   @Get(":id")

@@ -1,4 +1,4 @@
-import { HomeIcon } from "lucide-react";
+import { HomeIcon, Settings } from "lucide-react";
 
 export const APP_TITLE = "RateMonks";
 
@@ -14,7 +14,7 @@ export const pathnameMap = {
 };
 
 export const defaultMap = {
-  title: "Home",
+  title: "Dashboard",
   description: "",
 };
 
@@ -41,6 +41,12 @@ export const routes = [
     icon: HomeIcon,
     activeIcon: HomeIcon,
     requiredRoles: ["SYSTEM_ADMIN"],
+  },
+  {
+    label: "Settings",
+    href: "/settings",
+    icon: Settings,
+    activeIcon: HomeIcon,
   },
 
   // Store Owner routes

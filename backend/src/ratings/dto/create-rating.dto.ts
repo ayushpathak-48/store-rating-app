@@ -1,6 +1,6 @@
 import { IsInt, Min, Max, IsNotEmpty } from "class-validator";
 
-export class CreateRatingDto {
+export class RatingDto {
   @IsNotEmpty({ message: "storeId is required" })
   storeId: string;
 

@@ -17,6 +17,22 @@ export class AdminService {
     };
   }
 
+  async getAllUsers() {
+    const users = await this.prisma.user.findMany({
+      omit: {
+        password: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return {
+      success: true,
+      message: "Users retrieved successfully",
+      data: users,
+    };
+  }
+
   async getProfile(id: string) {
     const userData = await this.prisma.user.findUnique({
       where: { id },

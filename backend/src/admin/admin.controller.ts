@@ -16,6 +16,12 @@ export class AdminController {
     return this.adminService.getStats();
   }
 
+  // Get all ratings of a user
+  @Get("users")
+  async getAllUsers() {
+    return this.adminService.getAllUsers();
+  }
+
   @Get("users/:userId")
   getProfile(@Param("userId") userId: string) {
     return this.adminService.getProfile(userId);

@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-
 import { MobileSidebar } from "@/components/common/mobile-sidebar";
 import { APP_TITLE, defaultMap, pathnameMap } from "@/lib/constants";
 import { UserButton } from "@/components/common/user-button";
 import { Link, useLocation } from "react-router";
-import ThemeToggle from "./theme-toggler-button";
+import { ThemeToggle } from "./theme-toggler-button";
 
 export const Navbar = () => {
   const location = useLocation();
   const pathnameParts = location.pathname.split("/");
-  const pathnameKey = pathnameParts[2] as keyof typeof pathnameMap;
+  const pathnameKey = (
+    pathnameParts.includes("admin") ? pathnameParts[2] : pathnameParts[1]
+  ) as keyof typeof pathnameMap;
   const { title, description } = pathnameMap[pathnameKey] || defaultMap;
 
   return (

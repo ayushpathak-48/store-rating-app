@@ -29,7 +29,7 @@ export const useUserStore = create<UserState>((set) => ({
   getAllUsers: async () => {
     set({ loading: true });
     try {
-      const response = await API.get("/users");
+      const response = await API.get("/admin/users");
       const { data: users } = response.data;
       const storeOwners = users.filter(
         (user: User) => user.role === "STORE_OWNER",

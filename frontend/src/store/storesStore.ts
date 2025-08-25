@@ -2,6 +2,7 @@ import { create } from "zustand";
 import API from "@/lib/api";
 import { toast } from "sonner";
 import type { StoreSchemaType } from "@/schema/store.schema";
+import { formatStoresForUser } from "@/lib/utils";
 
 export interface Store {
   id: string;
@@ -10,6 +11,8 @@ export interface Store {
   address: string;
   ownerId: string;
   createdAt: string;
+  ratings?: any[];
+  userRating?: any;
 }
 
 interface StoresState {
@@ -18,14 +21,15 @@ interface StoresState {
   loading: boolean;
   isStoresLoaded: boolean;
   error: string | null;
-  fetchStores: () => Promise<void>;
+  fetchStores: (includeRatings?: boolean) => Promise<void>;
   addStore: (store: Omit<Store, "id" | "createdAt">) => Promise<void>;
   updateStore: (id: string, updatedData: StoreSchemaType) => Promise<void>;
   deleteStore: (id: string) => Promise<void>;
   setSelectedStore: (store: Store) => void;
+  updateRatings: (storeId: string, rating: number) => Promise<boolean>;
 }
 
-export const useStoresStore = create<StoresState>((set) => ({
+export const useStoresStore = create<StoresState>((set, get) => ({
   stores: [],
   selectedStore: null,
   loading: false,
@@ -33,20 +37,18 @@ export const useStoresStore = create<StoresState>((set) => ({
   error: null,
 
   // Fetch all stores
-  fetchStores: async () => {
+  fetchStores: async (includeRatings = false) => {
     set({ loading: true, error: null });
     try {
-      const { data: res } = await API.get("/stores");
-      if (!res.success) {
-        toast.error(res.message || "Failed to get all stores");
-        set({
-          error: res?.message || "Failed to get all stores",
-          loading: false,
-        });
-        return;
-      }
-      set({ stores: res.data, loading: false });
+      const { data: res } = await API.get(
+        `/stores${includeRatings ? `?includeRatings=true` : ""}`,
+      );
+
+      const formattedStores = formatStoresForUser(res.data);
+      set({ stores: formattedStores, loading: false });
     } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to get all stores");
       set({
         error: err.response?.data?.message || "Failed to fetch stores",
         loading: false,
@@ -146,4 +148,43 @@ export const useStoresStore = create<StoresState>((set) => ({
 
   // Set selected store
   setSelectedStore: (store) => set({ selectedStore: store }),
+
+  // Add or Update rating
+  updateRatings: async (storeId: string, rating: number) => {
+    set({ loading: true, error: null });
+    const loadingToast = toast.loading("Please wait while updating ratings...");
+    try {
+      const { data: res } = await API.post(`/ratings`, { storeId, rating });
+      const updatedStores = get()?.stores.map((store) => {
+        if (store.id === storeId) {
+          return {
+            ...store,
+            ratings: store?.ratings?.length
+              ? store?.ratings?.map((rating: any) =>
+                  rating.id == res.data.id ? res.data : rating,
+                )
+              : [],
+            userRating: res.data.userRating,
+          };
+        }
+        return store;
+      });
+
+      // Format the stores before setting
+      const formattedStores = formatStoresForUser(updatedStores);
+      set({ stores: formattedStores, loading: false });
+      toast.success("Ratings updated successfully");
+      return true;
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to update ratings");
+      set({
+        error: err.response?.data?.message || "Failed to update ratings",
+        loading: false,
+      });
+      return false;
+    } finally {
+      toast.dismiss(loadingToast);
+    }
+  },
 }));

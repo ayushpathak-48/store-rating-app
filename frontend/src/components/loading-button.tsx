@@ -18,7 +18,7 @@ export const LoadingButton = ({
   loadingText = "Please wait...",
   children,
   ...props
-}: LoadingButtonprops) => {
+}: LoadingButtonprops & React.ComponentProps<"button">) => {
   return (
     <Button {...props} disabled={disabled || isLoading}>
       {isLoading ? (

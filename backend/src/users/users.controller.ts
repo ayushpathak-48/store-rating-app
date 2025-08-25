@@ -15,11 +15,6 @@ import { User } from "@prisma/client";
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
-  // Get all ratings of a user
-  @Get()
-  async getAllUsers() {
-    return this.userService.getAllUsers();
-  }
 
   @Delete(":userId")
   async deleteUser(@Param("userId") userId: string, @Req() req) {

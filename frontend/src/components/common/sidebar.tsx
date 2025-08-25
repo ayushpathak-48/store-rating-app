@@ -6,9 +6,10 @@ import { APP_TITLE } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { Link } from "react-router";
-import { logoutUser } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
 
 export const Sidebar = () => {
+  const logout = useAuthStore((state) => state.logout);
   return (
     <aside className="h-full bg-neutral-100 dark:bg-gray-900 p-4 w-full flex flex-col justify-between">
       <div>
@@ -21,7 +22,7 @@ export const Sidebar = () => {
       <div className="flex flex-col">
         <DottedSeparator className="my-4" />
         <Button
-          onClick={logoutUser}
+          onClick={() => logout()}
           variant={"outline"}
           className="w-full mt-auto"
         >

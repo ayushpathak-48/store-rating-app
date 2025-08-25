@@ -9,21 +9,6 @@ import { PrismaService } from "src/prisma/prisma.service";
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
-  async getAllUsers() {
-    const users = await this.prisma.user.findMany({
-      omit: {
-        password: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    return {
-      success: true,
-      message: "Users retrieved successfully",
-      data: users,
-    };
-  }
 
   // Get all ratings of a user
   async getSingleUserAllRatings(userId: string) {

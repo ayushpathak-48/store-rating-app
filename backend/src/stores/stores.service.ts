@@ -3,7 +3,6 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Role, User } from "@prisma/client";
@@ -85,14 +84,16 @@ export class StoresService {
     };
   }
 
-  async getAllStores() {
+  async getAllStores(includeRatings: boolean) {
     const stores = await this.prisma.store.findMany({
       include: {
+        ratings: includeRatings, // Include ratings only if requested
         _count: {
           select: { ratings: true },
         },
       },
     });
+
     return {
       success: true,
       message: "Stores retrieved successfully",
@@ -174,7 +175,7 @@ export class StoresService {
 
     if (user.role !== "SYSTEM_ADMIN") {
       if (store.ownerId !== user.id) {
-        throw new UnauthorizedException({
+        throw new ForbiddenException({
           success: false,
           message: "You are not authorized to view this store ratings",
         });

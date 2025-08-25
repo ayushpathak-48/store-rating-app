@@ -13,7 +13,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
       }
       // If token is expired
       else if (info?.message === "jwt expired") {
-        message = "Your session has expired, please login again";
+        message = "token-expired";
       }
       // If token is invalid
       else if (

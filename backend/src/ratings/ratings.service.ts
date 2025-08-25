@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { CreateRatingDto } from "./dto/create-rating.dto";
+import { RatingDto } from "./dto/create-rating.dto";
 import { Role } from "@prisma/client";
 
 @Injectable()
@@ -20,7 +20,7 @@ export class RatingsService {
   }
 
   // Add or update rating
-  async rateStore(userId: string, dto: CreateRatingDto) {
+  async rateStore(userId: string, dto: RatingDto) {
     const store = await this.prisma.store.findUnique({
       where: { id: dto.storeId },
     });
@@ -57,34 +57,6 @@ export class RatingsService {
       },
     });
     return { success: true, message: "Rating added successfully", data };
-  }
-
-  // Get single store all ratings
-  async getSingleRatingById(ratingId: string, userRole: Role, userId: string) {
-    const singleRating = await this.prisma.rating.findUnique({
-      where: { id: ratingId },
-      include: { store: true, user: { omit: { password: true } } },
-    });
-
-    if (!singleRating) {
-      throw new NotFoundException({
-        success: false,
-        message: "Rating not found",
-      });
-    }
-
-    if (singleRating.userId !== userId && userRole !== "SYSTEM_ADMIN") {
-      throw new NotFoundException({
-        success: false,
-        message: "You are not allowed to view this rating",
-      });
-    }
-
-    return {
-      success: true,
-      message: "Rating get successfully",
-      data: singleRating,
-    };
   }
 
   // delete single rating of a store

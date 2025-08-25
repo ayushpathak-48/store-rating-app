@@ -11,10 +11,10 @@ import {
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Loader, LogOutIcon } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
-import { logoutUser } from "@/lib/utils";
 
 export const UserButton = () => {
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const { name, email } = user || { name: "user", email: "email@guest.com" };
   const isLoading = false;
 
@@ -55,7 +55,7 @@ export const UserButton = () => {
         </div>
         <DottedSeparator className="mb-1" />
         <DropdownMenuItem
-          onClick={() => logoutUser()}
+          onClick={() => logout()}
           className="h-10 flex items-center justify-center text-red-700 font-medium cursor-pointer"
         >
           <LogOutIcon className="size-4 mr-2" />

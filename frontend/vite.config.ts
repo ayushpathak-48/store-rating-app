@@ -15,8 +15,8 @@ export default defineConfig({
     port: 5173, // optional
     proxy: {
       "/api": {
-        target: "https://store-rating-app-ijr7.onrender.com", // your backend URL
-        // target: "http://localhost:3000", // your backend URL
+        // target: "https://store-rating-app-ijr7.onrender.com", // your backend URL
+        target: "http://localhost:3000", // your backend URL
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),

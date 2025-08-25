@@ -1,14 +1,30 @@
-// src/routes/ProtectedLayout.tsx
 import { Navigate, Outlet } from "react-router";
 import { useAuthStore } from "../store/authStore";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Navbar } from "@/components/common/navbar";
 import { Sidebar } from "@/components/common/sidebar";
+import { useEffect } from "react";
+import { Loader } from "lucide-react";
 
 const ProtectedLayout = () => {
+  const getProfile = useAuthStore((state) => state.getProfile);
+  const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
+  useEffect(() => {
+    if (!user && isAuthenticated) {
+      getProfile();
+    }
+  }, [getProfile, user, isAuthenticated]);
+
   if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
+
+  if (!user)
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Loader className="animate-spin" />
+      </div>
+    );
 
   return (
     <div className="min-h-screen">

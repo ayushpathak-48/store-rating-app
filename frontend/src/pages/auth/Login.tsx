@@ -46,8 +46,10 @@ export const LoginPage = () => {
     setIsLoading(true);
     try {
       const loggedIn = await login(values);
-      toast.success("Login Successfull");
-      if (loggedIn) navigate("/", { replace: true });
+      if (loggedIn) {
+        toast.success("Login Successfull");
+        navigate("/", { replace: true });
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to sign in");
     }
