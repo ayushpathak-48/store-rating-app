@@ -14,7 +14,7 @@ npx prisma generate
 npm run start:dev
 ```
 
-## Project setup
+## Run Frontend code
 
 ```bash
 cd frontend
