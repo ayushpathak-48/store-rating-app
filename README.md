@@ -7,19 +7,19 @@ JWT_REFRESH_SECRET=YOUR_SECRET_KEY
 ```
 ## Run following commands one by one
 ```bash
-$ cd backend
-$ npm install
-$ npx prisma migrate deploy
-$ npx prisma generate
-$ npm run start:dev
+cd backend
+npm install
+npx prisma migrate deploy
+npx prisma generate
+npm run start:dev
 ```
 
 ## Project setup
 
 ```bash
-$ cd frontend
-$ npm install
-$npm run dev
+cd frontend
+npm install
+npm run dev
 ```
 
 
