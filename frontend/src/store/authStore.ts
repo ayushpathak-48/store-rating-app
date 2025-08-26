@@ -119,22 +119,21 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   updatePassword: async (values: UpdatePasswordSchemaType) => {
-    set({ loading: true });
     const { confirm_password, ...data } = values;
     if (!(data.new_password === confirm_password)) {
       toast.error("New Password and confirm password does not match");
+      return false;
     }
-    const loadingToast = toast.loading("Updating user! Please wait...");
+    const loadingToast = toast.loading("Updating password! Please wait...");
     try {
       await API.put(`/auth/password`, data);
       toast.success("Password updated successfully");
       return true;
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.message || "Failed to update password");
       return false;
     } finally {
       toast.dismiss(loadingToast);
-      set({ loading: false });
     }
   },
 }));
