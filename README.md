@@ -1,5 +1,5 @@
 ## Run Backend
-### Add environement variables (.env)
+### Add environement variables (backend/.env)
 ```bash
 DATABASE_URL=POSTGRESS_DATABASE_URL
 JWT_SECRET=YOUR_SECRET_KEY
