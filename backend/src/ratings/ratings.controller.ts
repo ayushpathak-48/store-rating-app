@@ -15,6 +15,11 @@ import { JwtAuthGuard } from "src/auth/guards/auth.guard";
 export class RatingsController {
   constructor(private readonly ratingsService: RatingsService) {}
 
+  @Get(":storeId")
+  async getStoreRatings(storeId: string) {
+    return this.ratingsService.getStoreRatings(storeId);
+  }
+
   @Get("total")
   async getRatingsCount() {
     return this.ratingsService.getRatingsCount();

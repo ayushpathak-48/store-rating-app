@@ -31,9 +31,9 @@ export const UpdatePasswordSchema = z
   .object({
     old_password: z
       .string()
-      .nonempty({ message: "Old Password is required" })
-      .min(8, { message: "Old Password should be minimum 8 characters long" })
-      .max(16, { message: "Old Password cannot exceed 16 characters" })
+      .nonempty({ error: "Old Password is required" })
+      .min(8, { error: "Old Password should be minimum 8 characters long" })
+      .max(16, { error: "Old Password cannot exceed 16 characters" })
       .regex(
         /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).*$/,
         "Password must contain at least one uppercase letter and one special character",
@@ -41,9 +41,9 @@ export const UpdatePasswordSchema = z
 
     new_password: z
       .string()
-      .nonempty({ message: "New Password is required" })
-      .min(8, { message: "New Password should be minimum 8 characters long" })
-      .max(16, { message: "New Password cannot exceed 16 characters" })
+      .nonempty({ error: "New Password is required" })
+      .min(8, { error: "New Password should be minimum 8 characters long" })
+      .max(16, { error: "New Password cannot exceed 16 characters" })
       .regex(
         /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).*$/,
         "Password must contain at least one uppercase letter and one special character",
@@ -51,12 +51,12 @@ export const UpdatePasswordSchema = z
 
     confirm_password: z
       .string()
-      .nonempty({ message: "Confirm Password is required" })
+      .nonempty({ error: "Confirm Password is required" })
       .min(8, {
-        message: "Confirm Password should be minimum 8 characters long",
+        error: "Confirm Password should be minimum 8 characters long",
       })
       .max(16, {
-        message: "Confirm Password cannot exceed 16 characters",
+        error: "Confirm Password cannot exceed 16 characters",
       })
       .regex(
         /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).*$/,
@@ -64,11 +64,11 @@ export const UpdatePasswordSchema = z
       ),
   })
   .refine((data) => data.new_password === data.confirm_password, {
-    message: "New Password and Confirm Password must match",
+    error: "New Password and Confirm Password must match",
     path: ["confirm_password"],
   })
   .refine((data) => data.old_password !== data.new_password, {
-    message: "New Password cannot be the same as Old Password",
+    error: "New Password cannot be the same as Old Password",
     path: ["new_password"],
   });
 

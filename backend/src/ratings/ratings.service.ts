@@ -7,6 +7,18 @@ import { Role } from "@prisma/client";
 export class RatingsService {
   constructor(private prisma: PrismaService) {}
 
+  async getStoreRatings(storeId: string) {
+    const ratings = await this.prisma.rating.findMany({
+      where: { storeId },
+      include: { user: true },
+    });
+    return {
+      success: true,
+      message: "All Ratings retrieved successfully",
+      data: ratings,
+    };
+  }
+
   // Get total number of ratings
   async getRatingsCount() {
     const ratings = await this.prisma.rating.count();

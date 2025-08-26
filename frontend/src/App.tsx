@@ -6,10 +6,10 @@ import { useAuthStore } from "./store/authStore";
 import { SignUpPage } from "@/pages/auth/Signup";
 import NotFound from "@/components/not-found-page";
 import { AdminLayout } from "./routes/AdminLayout";
-import AdminDashboard from "@/pages/admin/Dashboard";
-import OwnerDashboard from "@/pages/owner/Dashboard";
+import AdminDashboard from "@/pages/admin/admin-dashboard.tsx";
+import { OwnerDashboard } from "@/pages/owner/owner-dashboard";
 import ProtectedLayout from "@/routes/ProtectedLayout";
-import { UserDashboard } from "@/pages/user/Dashboard";
+import { UserDashboard } from "@/pages/user/user-dashboard";
 import { SettingsPage } from "@/pages/settings/settings-page";
 import { AddUserPage } from "@/pages/admin/users/add/add-user-page";
 import { AddNewStore } from "@/pages/admin/stores/add/add-store-page";
@@ -56,9 +56,6 @@ function App() {
             <Route path="users/:userId" element={<UserDetailsPage />} />
             <Route path="users/edit/:userId" element={<EditUserPage />} />
           </Route>
-
-          {/* Store Owner Routes */}
-          <Route path="/owner" element={<OwnerDashboard />} />
 
           {/* Normal Routes */}
           <Route path="/settings" element={<SettingsPage />} />

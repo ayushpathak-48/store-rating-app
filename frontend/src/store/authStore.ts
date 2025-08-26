@@ -16,6 +16,7 @@ export interface User {
   email: string;
   role: UserRoles;
   address: string;
+  store: any;
 }
 
 interface AuthState {

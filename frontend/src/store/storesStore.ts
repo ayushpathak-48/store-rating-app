@@ -18,41 +18,30 @@ export interface Store {
 interface StoresState {
   stores: Store[];
   selectedStore: Store | null;
-  loading: boolean;
   isStoresLoaded: boolean;
-  error: string | null;
   fetchStores: (includeRatings?: boolean) => Promise<void>;
   addStore: (store: Omit<Store, "id" | "createdAt">) => Promise<void>;
   updateStore: (id: string, updatedData: StoreSchemaType) => Promise<void>;
   deleteStore: (id: string) => Promise<void>;
-  setSelectedStore: (store: Store) => void;
   updateRatings: (storeId: string, rating: number) => Promise<boolean>;
 }
 
 export const useStoresStore = create<StoresState>((set, get) => ({
   stores: [],
   selectedStore: null,
-  loading: false,
   isStoresLoaded: false,
-  error: null,
 
   // Fetch all stores
   fetchStores: async (includeRatings = false) => {
-    set({ loading: true, error: null });
     try {
       const { data: res } = await API.get(
         `/stores${includeRatings ? `?includeRatings=true` : ""}`,
       );
-
       const formattedStores = formatStoresForUser(res.data);
-      set({ stores: formattedStores, loading: false });
+      set({ stores: formattedStores });
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data?.message || "Failed to get all stores");
-      set({
-        error: err.response?.data?.message || "Failed to fetch stores",
-        loading: false,
-      });
     } finally {
       set({ isStoresLoaded: true });
     }
@@ -60,17 +49,8 @@ export const useStoresStore = create<StoresState>((set, get) => ({
 
   // Add a store
   addStore: async (storeData) => {
-    set({ loading: true, error: null });
     try {
       const { data: res } = await API.post("/stores/create", storeData);
-      if (!res.success) {
-        toast.error(res.message || "Failed to add store");
-        set({
-          error: res?.message || "Failed to add store",
-          loading: false,
-        });
-        return null;
-      }
       set((state) => ({
         stores: [...state.stores, res.data],
         loading: false,
@@ -79,27 +59,14 @@ export const useStoresStore = create<StoresState>((set, get) => ({
       return res.data;
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to add store");
-      set({
-        error: err.response?.data?.message || "Failed to add store",
-        loading: false,
-      });
+      throw err;
     }
   },
 
   // Update a store
   updateStore: async (id: string, updatedData: StoreSchemaType) => {
-    set({ loading: true, error: null });
     try {
       const { data: res } = await API.put(`/stores/${id}`, updatedData);
-      if (!res.success) {
-        toast.error(res.message || "Failed to update store");
-        set({
-          error: res?.message || "Failed to update store",
-          loading: false,
-        });
-        return;
-      }
-
       set((state) => ({
         stores: state.stores.map((store) =>
           store.id === id ? { ...store, ...res.data } : store,
@@ -108,10 +75,7 @@ export const useStoresStore = create<StoresState>((set, get) => ({
       }));
       toast.success("Store updated successfully");
     } catch (err: any) {
-      set({
-        error: err.response?.data?.message || "Failed to update store",
-        loading: false,
-      });
+      toast.error(err.response?.data?.message || "Failed to update store");
     }
   },
 
@@ -120,38 +84,22 @@ export const useStoresStore = create<StoresState>((set, get) => ({
     const loadingToast = toast.loading(
       "Please wait while deleting the store...",
     );
-    set({ loading: true, error: null });
     try {
-      const { data: res } = await API.delete(`/stores/${id}`);
-      toast.dismiss(loadingToast);
-      if (!res.success) {
-        toast.error(res.message || "Failed to delete store");
-        set({
-          error: res?.message || "Failed to delete store",
-          loading: false,
-        });
-        return;
-      }
+      await API.delete(`/stores/${id}`);
       toast.success("Store deleted successfully");
       set((state) => ({
         stores: state.stores.filter((store) => store.id !== id),
         loading: false,
       }));
     } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to delete store");
+    } finally {
       toast.dismiss(loadingToast);
-      set({
-        error: err.response?.data?.message || "Failed to delete store",
-        loading: false,
-      });
     }
   },
 
-  // Set selected store
-  setSelectedStore: (store) => set({ selectedStore: store }),
-
   // Add or Update rating
   updateRatings: async (storeId: string, rating: number) => {
-    set({ loading: true, error: null });
     const loadingToast = toast.loading("Please wait while updating ratings...");
     try {
       const { data: res } = await API.post(`/ratings`, { storeId, rating });
@@ -172,16 +120,12 @@ export const useStoresStore = create<StoresState>((set, get) => ({
 
       // Format the stores before setting
       const formattedStores = formatStoresForUser(updatedStores);
-      set({ stores: formattedStores, loading: false });
+      set({ stores: formattedStores });
       toast.success("Ratings updated successfully");
       return true;
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data?.message || "Failed to update ratings");
-      set({
-        error: err.response?.data?.message || "Failed to update ratings",
-        loading: false,
-      });
       return false;
     } finally {
       toast.dismiss(loadingToast);

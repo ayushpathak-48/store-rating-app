@@ -43,7 +43,7 @@ export class AuthController {
   @Put("password")
   @UseGuards(JwtAuthGuard)
   async updatePassword(@Req() req, @Body() data: updatePasswordDto) {
-    return this.authService.updatePassword(data, req.user);
+    return this.authService.updatePassword(data, req.user as User);
   }
 
   @Get("profile")

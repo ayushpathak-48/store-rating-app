@@ -24,6 +24,16 @@ export class StoresService {
       );
     }
 
+    const userAlreadyHaveStore = await this.prisma.store.findUnique({
+      where: { ownerId: dto.ownerId },
+    });
+
+    if (userAlreadyHaveStore) {
+      throw new BadRequestException(
+        "The store owner already has a store. Please provide a different owner.",
+      );
+    }
+
     const isEmailUsed = await this.prisma.store.findFirst({
       where: { email: dto.email },
     });
@@ -98,22 +108,6 @@ export class StoresService {
       success: true,
       message: "Stores retrieved successfully",
       data: stores,
-    };
-  }
-
-  async getSingleStore(storeId: string, userRole: Role, userId: string) {
-    const store = await this.prisma.store.findUnique({
-      where: { id: storeId },
-    });
-
-    if (!store) throw new NotFoundException("Store not found");
-    if (userRole === Role.STORE_OWNER && store.ownerId !== userId)
-      throw new ForbiddenException("You do not have access to this store");
-
-    return {
-      success: true,
-      message: "Store retrieved successfully",
-      data: store,
     };
   }
 

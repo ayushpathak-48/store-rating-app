@@ -41,29 +41,10 @@ export class StoresController {
     return this.storesService.getAllStores(include);
   }
 
-  @Get(":id")
-  getSingleStore(@Param("id") id: string, @Req() req) {
-    return this.storesService.getSingleStore(
-      id,
-      req.user.role as Role,
-      req.user.id as string,
-    );
-  }
-
   @Delete(":id")
   @Roles(Role.STORE_OWNER, Role.SYSTEM_ADMIN)
   deleteStore(@Param("id") id: string, @Req() req) {
     return this.storesService.deleteStore(
-      id,
-      req.user.role as Role,
-      req.user.id as string,
-    );
-  }
-
-  @Get(":id/ratings")
-  @Roles(Role.STORE_OWNER, Role.SYSTEM_ADMIN)
-  getStoreRatings(@Param("id") id: string, @Req() req) {
-    return this.storesService.getStoreRatings(
       id,
       req.user.role as Role,
       req.user.id as string,
