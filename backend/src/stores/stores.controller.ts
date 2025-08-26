@@ -36,9 +36,9 @@ export class StoresController {
   }
 
   @Get()
-  getAllStores(@Req() req, @Query("includeRatings") includeRatings?: string) {
+  getAllStores(@Query("includeRatings") includeRatings?: string) {
     const include = includeRatings === "true";
-    return this.storesService.getAllStores(include, req.user.id as string);
+    return this.storesService.getAllStores(include);
   }
 
   @Get(":id")
