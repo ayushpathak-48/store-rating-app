@@ -1,7 +1,13 @@
 ## Run Backend
-
+### add environement variables
 ```bash
-$cd baackend
+DATABASE_URL=POSTGRESS_DATABASE_URL
+JWT_SECRET=YOUR_SECRET_KEY
+JWT_REFRESH_SECRET=YOUR_SECRET_KEY
+```
+## Run commands
+```bash
+$ cd baackend
 $ npm install
 $ npx prisma migrate deploy
 $ npx prisma generate
