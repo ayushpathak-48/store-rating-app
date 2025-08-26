@@ -23,7 +23,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 function App() {
   const user = useAuthStore((state) => state.user);
   return (
-    <ThemeProvider defaultTheme="dark">
+    <ThemeProvider defaultTheme="system">
       <Routes>
         {/* Public routes  */}
         <Route element={<AuthLayout />}>
